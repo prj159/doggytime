@@ -20,7 +20,31 @@ const homeHref = import.meta.env.BASE_URL.endsWith('/')
 <header>
 	<nav>
 		<!-- 🛠️ 站点标题 — 文字来自 ../consts.ts 的 SITE_TITLE，链接指向 '/' -->
-		<h2><a href={homeHref}>{SITE_TITLE}</a></h2>
+		<h2 class="site-title">
+			<a class="site-title-link" href={homeHref}>
+				<!-- 第一步：默认显示站点标题文字；hover 时由 .title-text 做淡出/上移动画。 -->
+				<span class="title-text">{SITE_TITLE}</span>
+				<!-- 第二步：房子图标层；动画加在外层 span 上，SVG 本体保持静态绘制，避免线条抖动。 -->
+				<span class="title-hover" aria-hidden="true">
+					<svg
+						class="title-icon lucide lucide-house-icon lucide-house"
+						xmlns="http://www.w3.org/2000/svg"
+						width="24"
+						height="24"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						focusable="false"
+					>
+						<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+						<path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+					</svg>
+				</span>
+			</a>
+		</h2>
 
 		<!--
 		  🛠️ 导航链接 — 增删 <HeaderLink> 即可调整导航条目
@@ -74,64 +98,131 @@ const homeHref = import.meta.env.BASE_URL.endsWith('/')
 	/* ═══════════════════════════════════════════════════════════
 	   🛠️  可修改区域：样式 (CSS)
 	   ═══════════════════════════════════════════════════════════ */
+	   .site-title{
+			font-family: "Times New Roman", Times, serif;
+			font-size: larger;
+	   }
 
-	/* 🛠️ header 容器 */
-	header {
-		margin: 0;
-		padding: 0 1em;
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		z-index: 50;
-		min-height: 64px;
-		background: rgba(255, 255, 255, 0.484);
-		box-shadow: 0 2px 8px rgba(var(--black), 5%);
-		backdrop-filter: blur(14px);
-		-webkit-backdrop-filter: blur(14px);
-	}
-
-	nav {
-		position: relative;
-		z-index: 2;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		min-height: 64px;
-	}
-
-
-	h2 {
-		margin: 0;
-		font-size: 1em;
-	}
-
-	h2 a,
-	h2 a.active {
-		text-decoration: none;
-	}
-
-	nav a {
-		padding: 1em 0.5em;
-		color: rgb(var(--black));
-		border-bottom: 4px solid transparent;
-		text-decoration: none;
-	}
-
-	nav a.active {
-		text-decoration: none;
-		border-bottom-color: var(--accent);
-	}
-
-	.social-links,
-	.social-links a {
-		display: flex;
-	}
-
-	@media (max-width: 720px) {
-		.social-links {
-			display: none;
+	   .site-title-link {
+			position: relative;
+			display: inline-block;
+			color: rgb(var(--black));
+			text-decoration: none;
+			white-space: nowrap;
+			isolation: isolate;
+			transform: translate3d(0, 0, 0);
 		}
-	}
+
+		/* 第一步：文字层决定链接原始尺寸，hover 时只做 transform + opacity 动画。 */
+		.title-text {
+			display: block;
+			transform-origin: center;
+			backface-visibility: hidden;
+			pointer-events: none;
+			will-change: transform, opacity;
+			transition:
+				transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1),
+				opacity 0.14s ease;
+		}
+
+		/* 第二步：图标外层覆盖在文字中心，并负责弹入动画。 */
+		.title-hover {
+			position: absolute;
+			inset: 0;
+			display: grid;
+			place-items: center;
+			width: 1.0em;
+			height: 1.0em;
+			margin: auto;
+			opacity: 0;
+			pointer-events: none;
+			transform: translate3d(0, 7px, 0) scale(0.4);
+			transform-origin: center;
+			backface-visibility: hidden;
+			will-change: transform, opacity;
+			transition:
+				transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1),
+				opacity 0.14s ease;
+		}
+
+		/* SVG 只负责画 house 图标，不直接做动画，避免 stroke 缩放时看起来卡顿。 */
+		.title-icon {
+			display: block;
+			width: 100%;
+			height: 100%;
+			overflow: visible;
+			shape-rendering: geometricPrecision;
+		}
+
+		.site-title-link:hover .title-text,
+		.site-title-link:focus-visible .title-text {
+			opacity: 0;
+			transform: translate3d(0, -5px, 0) scale(0.9);
+		}
+
+		.site-title-link:hover .title-hover,
+		.site-title-link:focus-visible .title-hover {
+			opacity: 1;
+			transform: translate3d(0, 0, 0) scale(1);
+		}
+
+		/* 🛠️ header 容器 */
+		header {
+			margin: 0;
+			padding: 0 1em;
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			z-index: 50;
+			min-height: 64px;
+			/* background: rgba(255, 255, 255, 0); */
+			/* box-shadow: 0 2px 8px rgba(var(--black), 5%); */
+			/* backdrop-filter: blur(14px); */
+			/* -webkit-backdrop-filter: blur(14px); */
+		}
+
+		nav {
+			position: relative;
+			z-index: 2;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			min-height: 64px;
+		}
+
+
+		h2 {
+			margin: 0;
+			font-size: 1em;
+		}
+
+		h2 a,
+		h2 a.active {
+			text-decoration: none;
+		}
+
+		nav a {
+			padding: 1em 0.5em;
+			color: rgb(var(--black));
+			border-bottom: 4px solid transparent;
+			text-decoration: none;
+		}
+
+		nav a.active {
+			text-decoration: none;
+			border-bottom-color: var(--accent);
+		}
+
+		.social-links,
+		.social-links a {
+			display: flex;
+		}
+
+		@media (max-width: 720px) {
+			.social-links {
+				display: none;
+			}
+		}
 
 </style>
