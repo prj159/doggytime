@@ -1,17 +1,39 @@
 ---
-// 官方给的 Header 文件
+// ═══════════════════════════════════════════════════════════════
+//  🛠️  可修改区域：数据 & 组件引用
+//  - SITE_TITLE: 站点标题，修改 ../consts.ts 中的值
+//  - HeaderLink: 导航链接组件，见 ./HeaderLink.astro
+// ═══════════════════════════════════════════════════════════════
 import { SITE_TITLE } from '../consts';
 import HeaderLink from './HeaderLink.astro';
 ---
 
+<!--
+  ═══════════════════════════════════════════════════════════════
+  🛠️  可修改区域：页面结构 (HTML)
+  ═══════════════════════════════════════════════════════════════
+-->
 <header>
 	<nav>
+		<!-- 🛠️ 站点标题 — 文字来自 ../consts.ts 的 SITE_TITLE，链接指向 '/' -->
 		<h2><a href="/">{SITE_TITLE}</a></h2>
+
+		<!--
+		  🛠️ 导航链接 — 增删 <HeaderLink> 即可调整导航条目
+		  href: 页面路径  |  标签内容: 显示文字
+		  HeaderLink 组件自带 active 高亮逻辑，见 ./HeaderLink.astro
+		-->
 		<div class="internal-links">
 			<HeaderLink href="/">Home</HeaderLink>
 			<HeaderLink href="/blog">Blog</HeaderLink>
 			<HeaderLink href="/about">About</HeaderLink>
 		</div>
+
+		<!--
+		  🛠️ 社交图标 — 替换 href 为你的链接，替换 <svg> 为你的图标
+		  width/height: 图标尺寸 (32x32)
+		  .sr-only span: 无障碍描述文字
+		-->
 		<div class="social-links">
 			<a href="https://m.webtoo.ls/@astro" target="_blank">
 				<span class="sr-only">Follow Astro on Mastodon</span>
@@ -43,13 +65,38 @@ import HeaderLink from './HeaderLink.astro';
 		</div>
 	</nav>
 </header>
+
 <style>
+	/* ═══════════════════════════════════════════════════════════
+	   🛠️  可修改区域：样式 (CSS)
+	   ═══════════════════════════════════════════════════════════ */
+
+	/* 🛠️ header 容器 */
 	header {
 		margin: 0;
 		padding: 0 1em;
-		background: white;
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		z-index: 50;
+		min-height: 64px;
+		background: rgba(255, 255, 255, 0.484);
 		box-shadow: 0 2px 8px rgba(var(--black), 5%);
+		backdrop-filter: blur(14px);
+		-webkit-backdrop-filter: blur(14px);
 	}
+
+	nav {
+		position: relative;
+		z-index: 2;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		min-height: 64px;
+	}
+
+
 	h2 {
 		margin: 0;
 		font-size: 1em;
@@ -59,28 +106,28 @@ import HeaderLink from './HeaderLink.astro';
 	h2 a.active {
 		text-decoration: none;
 	}
-	nav {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-	}
+
 	nav a {
 		padding: 1em 0.5em;
-		color: var(--black);
+		color: rgb(var(--black));
 		border-bottom: 4px solid transparent;
 		text-decoration: none;
 	}
+
 	nav a.active {
 		text-decoration: none;
 		border-bottom-color: var(--accent);
 	}
+
 	.social-links,
 	.social-links a {
 		display: flex;
 	}
+
 	@media (max-width: 720px) {
 		.social-links {
 			display: none;
 		}
 	}
+
 </style>

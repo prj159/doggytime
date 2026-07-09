@@ -1,49 +1,200 @@
 ---
 import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
+import Header from '../components/MyHeader.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+
+// 这里是 Astro 的组件脚本区域，我们稍后会在这里引入背景代码
+
 ---
 
 <!doctype html>
-<html lang="en">
+
+<html lang="zh-CN">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<title>狗狗爱卷卷</title>
 	</head>
+
 	<body>
+		<canvas id="noise-canvas"></canvas>
 		<Header />
-		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This template
-				serves as a lightweight, minimally-styled starting point for anyone looking to build a personal
-				website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to
-				<a href="https://docs.astro.build/">read the docs</a>
-				or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out
-				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a>
-				by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
+		<main class="content">
+		<h1>Doggy Time</h1>
+		<p>你好，欢迎来到我的个人博客。我主要在这里分享一些文章和想法。</p>
 		</main>
-		<Footer />
+
+		<style>
+			body, html {
+				margin: 0;
+				padding: 0;
+				height: 100%;
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+				color: #111; /* 字体颜色调深 */
+				overflow: hidden; /* 隐藏滚动条，保持全屏沉浸感 */
+			}
+			
+			.content {
+				height: 100vh; /* 撑满整个屏幕高度 (Viewport Height) */
+				display: flex;
+				flex-direction: column;
+				justify-content: center; /* 垂直居中 */
+				align-items: center;     /* 水平居中 */
+				text-align: center;
+				padding: 0 20px;
+				position: relative;
+				z-index: 1; /* 确保内容在噪声背景上方 */
+			}
+
+			h1 {
+				font-size: clamp(4rem, 10vw, 8rem);
+				font-weight: 700;
+				letter-spacing: 0;
+				margin-bottom: 0.2em;
+				font-family: "Times New Roman", Times, serif;
+				font-style: italic;
+				line-height: 1.12;
+
+				background: linear-gradient(
+					110deg,
+					#111 0%,
+					#111 40%,
+					#ffffff 50%,
+					#111 55%,
+					#111 100%
+				);
+
+				background-size: 280% 100%;
+				background-position: 100% 0;
+
+				-webkit-background-clip: text;
+				background-clip: text;
+				color: transparent;
+
+				transition:
+					background-position 1.1s cubic-bezier(0.22, 1, 0.36, 1),
+					letter-spacing 1.1s cubic-bezier(0.22, 1, 0.36, 1),
+					transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+
+				text-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
+			}
+
+			h1:hover {
+				background-position: 0 0;
+				letter-spacing: 0.02em;
+				transform: translateY(-0.04em);
+			}
+
+			p {
+				color: #555;
+				max-width: 400px; /* 限制段落宽度，让排版更紧凑 */
+				line-height: 1.6;
+			}
+
+			#noise-canvas {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100vw;
+			height: 100vh;
+			z-index: 0;
+			pointer-events: none;
+			}
+		</style>
+
+		<script>
+			import { createNoise3D } from 'simplex-noise';
+			const noise3D = createNoise3D(); // 启动一个 3D 噪声生成器
+
+			// 1. 获取画布和画笔
+			const canvas = document.getElementById('noise-canvas') as HTMLCanvasElement;
+			const ctx = canvas.getContext('2d');
+
+			// 2. 让画布尺寸和浏览器窗口一样大
+			canvas.width = window.innerWidth;
+			canvas.height = window.innerHeight;
+
+			// 3. 设定时间变量，让噪声动起来
+			let time = 0;
+
+			// 4.循环作画
+			// 只需要在初始化阶段执行一次，不要放进 draw() 里反复创建
+			const imageData = ctx.createImageData(canvas.width, canvas.height);
+			const pixels = imageData.data; // Uint8ClampedArray，每个像素占 4 字节 (R, G, B, A)
+
+			// 颜色查找表：色相(16)和饱和度(60%)不变，只有亮度随噪声波动
+			// 提前把 亮度 -> RGB 的映射算好，避免每个像素都重复做一次 HSL 转 RGB
+			// --- 颜色调节 ---
+			// 色相 hue: 改 hslToRgb 的第一个参数 (16/360)，0=红 120=绿 240=蓝
+			// 饱和度 saturation: 改 hslToRgb 的第二个参数 (0.6)，0=灰 1=鲜艳
+			const LUT_SIZE = 4096;
+			const colorLUT = new Uint8Array(LUT_SIZE * 3);
+
+			function hslToRgb(h, s, l) {
+				let r, g, b;
+				if (s === 0) {
+					r = g = b = l;
+				} else {
+					const hue2rgb = (p, q, t) => {
+						if (t < 0) t += 1;
+						if (t > 1) t -= 1;
+						if (t < 1 / 6) return p + (q - p) * 6 * t;
+						if (t < 1 / 2) return q;
+						if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+						return p;
+					};
+					const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+					const p = 2 * l - q;
+					r = hue2rgb(p, q, h + 1 / 3);
+					g = hue2rgb(p, q, h);
+					b = hue2rgb(p, q, h - 1 / 3);
+				}
+				return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+			}
+
+			for (let i = 0; i < LUT_SIZE; i++) {
+				// 假设噪声库的输出范围在 -1 到 1 之间
+				const value = (i / (LUT_SIZE - 1)) * 2 - 1;
+				let lightness = 22.5 * value + 72.5;	// 亮度范围 lightness
+				lightness = Math.min(100, Math.max(0, lightness));
+				const [r, g, b] = hslToRgb(16 / 360, 0.6, lightness / 100);
+				colorLUT[i * 3] = r;
+				colorLUT[i * 3 + 1] = g;
+				colorLUT[i * 3 + 2] = b;
+			}
+
+			function draw() {
+				if (!ctx) return;
+
+				const size = 1; // 像素粒度：值越大颗粒越粗（性能也越好），1=最细腻
+				const width = canvas.width;
+				const height = canvas.height;
+
+				for (let x = 0; x < width; x += size) {
+					for (let y = 0; y < height; y += size) {
+						// 噪声缩放：0.001 决定纹理密度，改小 → 图案更大更舒展，改大 → 图案更碎更密
+						const value = noise3D(x * 0.001, y * 0.001, time);
+
+						let idx = Math.round(((value + 1) * 0.5) * (LUT_SIZE - 1));
+						idx = idx < 0 ? 0 : idx >= LUT_SIZE ? LUT_SIZE - 1 : idx;
+						const o = idx * 3;
+
+						const p = (y * width + x) * 4;
+						pixels[p] = colorLUT[o];
+						pixels[p + 1] = colorLUT[o + 1];
+						pixels[p + 2] = colorLUT[o + 2];
+						pixels[p + 3] = 255;
+					}
+				}
+
+				// 一次性把整块像素数据刷新到画布，替代原来几十万次的 fillRect 调用
+				ctx.putImageData(imageData, 0, 0);
+
+				time += 0.02; // 动画速度：值越大流动越快，设为 0 则画面静止
+				requestAnimationFrame(draw);
+			}
+
+			// 5. 启动动画放映机
+			draw();
+		</script>
 	</body>
 </html>

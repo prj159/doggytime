@@ -3,6 +3,9 @@ dist/
 # generated types
 .astro/
 
+# local scratch
+.tmp/
+
 # dependencies
 node_modules/
 
