@@ -6,6 +6,10 @@
 // ═══════════════════════════════════════════════════════════════
 import { SITE_TITLE } from '../consts';
 import HeaderLink from './HeaderLink.astro';
+
+const homeHref = import.meta.env.BASE_URL.endsWith('/')
+	? import.meta.env.BASE_URL
+	: `${import.meta.env.BASE_URL}/`;
 ---
 
 <!--
@@ -16,7 +20,7 @@ import HeaderLink from './HeaderLink.astro';
 <header>
 	<nav>
 		<!-- 🛠️ 站点标题 — 文字来自 ../consts.ts 的 SITE_TITLE，链接指向 '/' -->
-		<h2><a href="/">{SITE_TITLE}</a></h2>
+		<h2><a href={homeHref}>{SITE_TITLE}</a></h2>
 
 		<!--
 		  🛠️ 导航链接 — 增删 <HeaderLink> 即可调整导航条目
