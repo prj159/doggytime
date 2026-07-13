@@ -3,8 +3,7 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/MyHeader.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 
-// 这里是 Astro 的组件脚本区域，我们稍后会在这里引入背景代码
-
+const today = new Date();
 ---
 
 <!doctype html>
@@ -19,16 +18,29 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 		<canvas id="noise-canvas"></canvas>
 		<Header />
 		<main class="content">
+		<!-- 标题 -->
 		<h1>Doggy Time</h1>
 
+		<!-- 博客卡片 -->
 		<p class="intro-card">
 			<!-- 可改：href 是点击后跳转的地址；aria-label 是读屏软件读出的链接说明。 -->
 			<a class="intro-link" href="/doggytime/blog" aria-label="进入博客">
 				<!-- 可改：平时显示的文字。 -->
-				<span class="intro-line intro-line--default" aria-hidden="true">/ Blog</span>
+				<span class="intro-line intro-line--default" aria-hidden="true">/ BLOG</span>
 				<!-- 可改：鼠标悬停或键盘聚焦时显示的文字。 -->
-				<span class="intro-line intro-line--hover" aria-hidden="true">/ Vist</span>
+				<span class="intro-line intro-line--hover" aria-hidden="true">/ VISIT</span>
 			</a>
+		</p>
+
+		<!-- 标题左下长文本 -->
+		<p class="longtext">
+			Doggy Time focuses on the accumulation and sharing of knowledge.
+		</p>
+
+		<!-- 网页 right -->
+		<p class="rights">
+			&copy; {today.getFullYear()} Doggy Time. <br />
+			All rights reserved.
 		</p>
 		</main>
 
@@ -53,6 +65,12 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 				z-index: 1; /* 确保内容在噪声背景上方 */
 			}
 
+			/* 首页内容区内现有及以后新增的所有 p 都统一使用 Average Sans。 */
+			.content p {
+				font-family: var(--font-average-sans), Arial, sans-serif;
+			}
+
+			/* 大标题 */
 			h1 {
 				/* 标题和卡片共用 content 的全屏网格区域，保留 stage 才能独立定位。 */
 				grid-area: stage;
@@ -110,6 +128,7 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 				transform: translateY(-0.04em);
 			}
 
+			/* 进入博客卡片 */
 			.intro-card {
 				grid-area: stage;
 				/* 可改：center 可换成 start/end，控制卡片在全屏网格中的大致位置。 */
@@ -117,13 +136,13 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 				/* 可改：依次为上、右、下、左外边距，用于微调卡片位置。 */
 				margin: 0 0 -12vh 36vw;
 
-				/* 可改：卡片最大宽度、字体、文字颜色。 */
+				/* 可改：卡片最大宽度和文字颜色。 */
 				box-sizing: border-box;
 				max-width: 400px;
-				font-family: "Times New Roman", Times, serif;
 				font-style: italic;
-				color: #000000;
-				font-size: 1.25rem; /* 可改：卡片字体大小。 */
+				color: #454545;
+				font-size: 1.2rem; /* 可改：卡片字体大小。 */
+				letter-spacing: 0.0em; /* 可改：字距；正数更疏，负数更紧 */
 				line-height: 1.6;
 
 				/* 可改：圆角矩形的填充色、边框、圆角和阴影。 */
@@ -169,6 +188,50 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 				opacity: 1;
 			}
 
+			/* 左下长文本 */
+			.longtext {
+				grid-area: stage;
+				/* 可改：center 可换成 start/end，控制文本在全屏网格中的大致位置。 */
+				place-self: center;
+				/* 可改：依次为上、右、下、左外边距，用于微调文本位置。 */
+				margin: 0 0 -19vh -25vw;
+				text-align: left; /* 文本左对齐 */
+
+				/* 可改：长文本框宽度与最小高度；内容超过最小高度时会自动向下扩展。 */
+				box-sizing: border-box;
+				width: 17rem;
+				min-height: 6rem;
+
+				/* 字体外观；字体家族由上方 .content p 统一设置。 */
+				font-style: italic;
+				color:#454545;
+				font-size: 1.0rem; /* 可改：卡片字体大小。 */
+				letter-spacing: 0.1em; /* 可改：字距；正数更疏，负数更紧 */
+				line-height: 1.2; /* 可改：行间距，数值越大行距越宽 */
+			}
+
+			/* 网页版权信息 */
+			.rights {
+				grid-area: stage;
+				/* 右下角：第一个 end 控制垂直靠下，第二个 end 控制水平靠右。 */
+				place-self: end end;
+				/* 可改：右、下边距控制版权信息与页面边缘的距离。 */
+				margin: 0 -24vw 2vh 0;
+				text-align: right; /* 文本右对齐 */
+
+				/* 可改：版权文本框宽度。 */
+				box-sizing: border-box;
+				width: 17rem;
+
+				/* 字体外观；字体家族由上方 .content p 统一设置。 */
+				font-style: italic;
+				color:#454545;
+				font-size: 0.8rem; /* 可改：卡片字体大小。 */
+				letter-spacing: 0.1em; /* 可改：字距；正数更疏，负数更紧 */
+				line-height: 1.2; /* 可改：行间距，数值越大行距越宽 */
+			}
+
+			/* 背景噪声 */
 			#noise-canvas {
 			position: fixed;
 			top: 0;
@@ -180,6 +243,7 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 			}
 		</style>
 
+		<!-- 绘制背景噪声 -->
 		<script>
 			import { createNoise3D } from 'simplex-noise';
 			const noise3D = createNoise3D(); // 启动一个 3D 噪声生成器

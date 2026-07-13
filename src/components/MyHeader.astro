@@ -95,15 +95,17 @@ const homeHref = import.meta.env.BASE_URL.endsWith('/')
 </header>
 
 <style>
-	/* ═══════════════════════════════════════════════════════════
-	   🛠️  可修改区域：样式 (CSS)
-	   ═══════════════════════════════════════════════════════════ */
-	   .site-title{
-			font-family: "Times New Roman", Times, serif;
-			font-size: larger;
-	   }
+	/* 站点标题 */
+	.site-title {
+		/* Average Sans 已在 astro.config.mjs 注册并由 BaseHead.astro 预加载。 */
+		font-family: var(--font-average-sans);
+		font-size: larger; /* 可改：站点标题字体大小。 */
+		letter-spacing: 0.02em; /* 可改：字距；正数更疏，负数更紧 */
+		font-weight: 500; /* 可改：400 为正常粗细，避免 h2 默认粗体 */
+	}
 
-	   .site-title-link {
+	/* 标题链接作为文字层和房子图标层的共同定位容器。 */
+	.site-title-link {
 			position: relative;
 			display: inline-block;
 			color: rgb(var(--black));
@@ -113,26 +115,27 @@ const homeHref = import.meta.env.BASE_URL.endsWith('/')
 			transform: translate3d(0, 0, 0);
 		}
 
-		/* 第一步：文字层决定链接原始尺寸，hover 时只做 transform + opacity 动画。 */
+		/* 默认文字层决定链接尺寸，悬停时只使用 transform 和 opacity 离场。 */
 		.title-text {
 			display: block;
 			transform-origin: center;
 			backface-visibility: hidden;
 			pointer-events: none;
 			will-change: transform, opacity;
+			/* 可改：0.14s 控制文字离场动画时长。 */
 			transition:
 				transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1),
 				opacity 0.14s ease;
 		}
 
-		/* 第二步：图标外层覆盖在文字中心，并负责弹入动画。 */
+		/* 房子图标层覆盖在文字中心，初始隐藏在下方并缩小。 */
 		.title-hover {
 			position: absolute;
 			inset: 0;
 			display: grid;
 			place-items: center;
-			width: 1.0em;
-			height: 1.0em;
+			width: 1.0em; /* 可改：房子图标宽度。 */
+			height: 1.0em; /* 可改：房子图标高度。 */
 			margin: auto;
 			opacity: 0;
 			pointer-events: none;
@@ -140,12 +143,13 @@ const homeHref = import.meta.env.BASE_URL.endsWith('/')
 			transform-origin: center;
 			backface-visibility: hidden;
 			will-change: transform, opacity;
+			/* 可改：0.14s 控制图标弹入动画时长。 */
 			transition:
 				transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1),
 				opacity 0.14s ease;
 		}
 
-		/* SVG 只负责画 house 图标，不直接做动画，避免 stroke 缩放时看起来卡顿。 */
+		/* SVG 只负责绘制图标，动画放在外层，避免缩放描边时产生抖动。 */
 		.title-icon {
 			display: block;
 			width: 100%;
@@ -154,6 +158,7 @@ const homeHref = import.meta.env.BASE_URL.endsWith('/')
 			shape-rendering: geometricPrecision;
 		}
 
+		/* 鼠标悬停或键盘聚焦时：文字上移淡出，房子图标弹入。 */
 		.site-title-link:hover .title-text,
 		.site-title-link:focus-visible .title-text {
 			opacity: 0;
@@ -166,7 +171,7 @@ const homeHref = import.meta.env.BASE_URL.endsWith('/')
 			transform: translate3d(0, 0, 0) scale(1);
 		}
 
-		/* 🛠️ header 容器 */
+		/* 固定在页面顶部的 header 容器。 */
 		header {
 			margin: 0;
 			padding: 0 1em;
@@ -175,33 +180,37 @@ const homeHref = import.meta.env.BASE_URL.endsWith('/')
 			left: 0;
 			right: 0;
 			z-index: 50;
-			min-height: 64px;
+			min-height: 64px; /* 可改：header 最小高度。 */
+			/* 可选：需要透明背景、阴影或毛玻璃时取消对应属性的注释。 */
 			/* background: rgba(255, 255, 255, 0); */
 			/* box-shadow: 0 2px 8px rgba(var(--black), 5%); */
 			/* backdrop-filter: blur(14px); */
 			/* -webkit-backdrop-filter: blur(14px); */
 		}
 
+		/* 导航栏使用 Flex 将站点标题、内部链接和社交链接横向排列。 */
 		nav {
 			position: relative;
 			z-index: 2;
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
-			min-height: 64px;
+			min-height: 64px; /* 可改：导航栏最小高度，通常与 header 保持一致。 */
 		}
 
-
+		/* 清除站点标题 h2 的默认外边距。 */
 		h2 {
 			margin: 0;
 			font-size: 1em;
 		}
 
+		/* 标题链接不显示普通链接下划线。 */
 		h2 a,
 		h2 a.active {
 			text-decoration: none;
 		}
 
+		/* 可改：导航链接的内边距、颜色与底部指示线。 */
 		nav a {
 			padding: 1em 0.5em;
 			color: rgb(var(--black));
@@ -209,16 +218,19 @@ const homeHref = import.meta.env.BASE_URL.endsWith('/')
 			text-decoration: none;
 		}
 
+		/* 当前页面的导航链接显示强调色底线。 */
 		nav a.active {
 			text-decoration: none;
 			border-bottom-color: var(--accent);
 		}
 
+		/* 社交链接及其点击区域使用 Flex 布局。 */
 		.social-links,
 		.social-links a {
 			display: flex;
 		}
 
+		/* 可改：视口不超过 720px 时隐藏社交链接。 */
 		@media (max-width: 720px) {
 			.social-links {
 				display: none;

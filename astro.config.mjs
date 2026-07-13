@@ -34,5 +34,21 @@ export default defineConfig({
                 ],
             },
         },
+        {
+            provider: fontProviders.local(),
+            name: 'Average Sans',
+            cssVariable: '--font-average-sans',
+            fallbacks: ['sans-serif'],
+            options: {
+                variants: [
+                    {
+                        src: ['./src/assets/fonts/AverageSans-Regular.woff2'],
+                        weight: 400,
+                        style: 'normal',
+                        display: 'swap',
+                    },
+                ],
+            },
+        },
     ],
 });
