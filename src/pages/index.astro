@@ -134,7 +134,7 @@ const today = new Date();
 				/* 可改：center 可换成 start/end，控制卡片在全屏网格中的大致位置。 */
 				place-self: center;
 				/* 可改：依次为上、右、下、左外边距，用于微调卡片位置。 */
-				margin: 0 0 -12vh 36vw;
+				margin: 0 0 -12vh 32vw;
 
 				/* 可改：卡片最大宽度和文字颜色。 */
 				box-sizing: border-box;
@@ -194,7 +194,7 @@ const today = new Date();
 				/* 可改：center 可换成 start/end，控制文本在全屏网格中的大致位置。 */
 				place-self: center;
 				/* 可改：依次为上、右、下、左外边距，用于微调文本位置。 */
-				margin: 0 0 -19vh -25vw;
+				margin: 0 0 -19vh -22vw;
 				text-align: left; /* 文本左对齐 */
 
 				/* 可改：长文本框宽度与最小高度；内容超过最小高度时会自动向下扩展。 */
@@ -216,7 +216,7 @@ const today = new Date();
 				/* 右下角：第一个 end 控制垂直靠下，第二个 end 控制水平靠右。 */
 				place-self: end end;
 				/* 可改：右、下边距控制版权信息与页面边缘的距离。 */
-				margin: 0 -24vw 2vh 0;
+				margin: 0 -26vw 2vh 0;
 				text-align: right; /* 文本右对齐 */
 
 				/* 可改：版权文本框宽度。 */
@@ -369,7 +369,7 @@ const today = new Date();
 
 				const startTime = performance.now();
 				function draw(now: number) {
-					gl.uniform1f(time, (now - startTime) * 0.0008);
+					gl.uniform1f(time, (now - startTime) * 0.0003);
 					gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 					requestAnimationFrame(draw);
 				}
