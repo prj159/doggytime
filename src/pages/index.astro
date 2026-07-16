@@ -18,24 +18,32 @@ const today = new Date();
 		<canvas id="noise-canvas"></canvas>
 		<Header />
 		<main class="content">
-		<!-- 标题 -->
-		<h1>Doggy Time</h1>
+			<!--
+				hero 是标题区域的外层容器：
+				标题、左侧说明、右侧按钮都放在里面，才能始终按彼此对齐。
+			-->
+			<section class="hero">
+				<h1>Doggy Time</h1>
 
-		<!-- 博客卡片 -->
-		<p class="intro-card">
-			<!-- 可改：href 是点击后跳转的地址；aria-label 是读屏软件读出的链接说明。 -->
-			<a class="intro-link" href="/doggytime/blog" aria-label="进入博客">
-				<!-- 可改：平时显示的文字。 -->
-				<span class="intro-line intro-line--default" aria-hidden="true">/ BLOG</span>
-				<!-- 可改：鼠标悬停或键盘聚焦时显示的文字。 -->
-				<span class="intro-line intro-line--hover" aria-hidden="true">/ VISIT</span>
-			</a>
-		</p>
+				<!-- 标题下方的一行：左边放说明，右边放博客按钮。 -->
+				<div class="hero-details">
+					<!-- 标题左下长文本 -->
+					<p class="longtext">
+						Doggy Time focuses on the accumulation and sharing of knowledge.
+					</p>
 
-		<!-- 标题左下长文本 -->
-		<p class="longtext">
-			Doggy Time focuses on the accumulation and sharing of knowledge.
-		</p>
+					<!-- 博客卡片 -->
+					<p class="intro-card">
+						<!-- 可改：href 是点击后跳转的地址；aria-label 是读屏软件读出的链接说明。 -->
+						<a class="intro-link" href="/doggytime/blog" aria-label="进入博客">
+							<!-- 可改：平时显示的文字。 -->
+							<span class="intro-line intro-line--default" aria-hidden="true">/ BLOG</span>
+							<!-- 可改：鼠标悬停或键盘聚焦时显示的文字。 -->
+							<span class="intro-line intro-line--hover" aria-hidden="true">/ VISIT</span>
+						</a>
+					</p>
+				</div>
+			</section>
 
 		<!-- 网页 right -->
 		<p class="rights">
@@ -55,48 +63,61 @@ const today = new Date();
 			}
 			
 			.content {
-				height: 100vh; /* 撑满整个屏幕高度 (Viewport Height) */
-				/* 标题和段落共享全屏网格，移动段落不会挤动标题。 */
-				display: grid;
-				grid-template: "stage" 1fr / 1fr;
+				/* 覆盖全局 main 的 720px 宽度限制：首页需要占满整个视口。 */
+				width: 100%;
+				max-width: none;
+				margin: 0;
+				/* svh 会避开移动端浏览器地址栏造成的高度跳动。 */
+				min-height: 100svh;
+				/*
+				 * 页面四周的安全边距。通常只需要改这个数值来调整版权离边缘的距离。
+				 * clamp(最小值, 随屏幕变化的值, 最大值)：小屏不会太贴边，大屏不会太空。
+				 */
+				--page-gutter: clamp(1.25rem, 3vw, 4rem);
 				text-align: center;
-				padding: 0 20px;
+				padding: var(--page-gutter);
+				box-sizing: border-box;
 				position: relative;
 				z-index: 1; /* 确保内容在噪声背景上方 */
 			}
 
-			/* 首页内容区内现有及以后新增的所有 p 都统一使用 Average Sans。 */
+			/* 首页内容区内现有及以后新增的所有 p 都统一使用 Average Sans（字体）。 */
 			.content p {
 				font-family: var(--font-average-sans), Arial, sans-serif;
 			}
 
+			/*
+			 * hero：整个标题区的位置。
+			 * 如果只想上下移动标题、说明和按钮这一整组，只改 top 的中间值 34svh。
+			 * 不要改 left 和 transform；这两个属性一起负责“整组水平居中”。
+			 */
+			.hero {
+				position: absolute;
+				top: clamp(9rem, 34svh, 22rem); /* 整组距离页面顶部的位置。 */
+				left: 50%;
+				/*
+				 * 宽度以标题为准；因此下面这一行的两端，正好是标题的左右边缘。
+				 * max-width 只是防止窄屏时内容超出页面。
+				 */
+				width: fit-content;
+				max-width: calc(100vw - (2 * var(--page-gutter)));
+				display: grid;
+				/* 标题与下方“说明 / 按钮”这一行之间的距离；需要调间距时改这里。 */
+				gap: clamp(1rem, 2vh, 2rem);
+				transform: translateX(-50%);
+			}
+
 			/* 大标题 */
 			h1 {
-				/* 标题和卡片共用 content 的全屏网格区域，保留 stage 才能独立定位。 */
-				grid-area: stage;
-				/*
-				 * 可改：标题位置，格式为“垂直位置 水平位置”。
-				 * center = 居中；start = 上/左；end = 下/右。
-				 * 示例：start start（左上）、center end（右侧居中）、end end（右下）。
-				 */
-				place-self: center;
-				/*
-				 * 可改：在 Grid 锚点基础上精确移动标题。
-				 * top：负数向上、正数向下；left：负数向左、正数向右。
-				 * 不使用 transform，避免与 h1:hover 的悬停动画冲突。
-				 */
-				position: relative;
-				top: -5vh;
-				left: 0vw;
-
 				font-size: clamp(4rem, 10vw, 8rem);
 				font-weight: 700;
 				letter-spacing: 0;
-				/* 保留标题原本的底部留白；它不再用于调整标题位置。 */
-				margin-bottom: 0.2em;
+				margin: 0;
 				font-family: "Times New Roman", Times, serif;
 				font-style: italic;
 				line-height: 1.12;
+				/* 宽屏不换行，保证 hero 的左右边缘就是标题左右边缘。 */
+				white-space: nowrap;
 
 				background: linear-gradient(
 					110deg,
@@ -128,13 +149,22 @@ const today = new Date();
 				transform: translateY(-0.04em);
 			}
 
+			/*
+			 * 说明与入口共享同一行：左、右边缘分别继承标题的左右边缘。
+			 * 这三条不用改：它们保证说明和按钮上对齐，并分别贴在两端。
+			 */
+			.hero-details {
+				display: flex;
+				align-items: flex-start;
+				justify-content: space-between;
+				gap: clamp(2rem, 8vw, 10rem);
+			}
+
 			/* 进入博客卡片 */
 			.intro-card {
-				grid-area: stage;
-				/* 可改：center 可换成 start/end，控制卡片在全屏网格中的大致位置。 */
-				place-self: center;
-				/* 可改：依次为上、右、下、左外边距，用于微调卡片位置。 */
-				margin: 0 0 -12vh 32vw;
+				margin: 0;
+				/* 按钮保持文字所需的宽度，不被左侧说明挤压。 */
+				flex: 0 0 auto;
 
 				/* 可改：卡片最大宽度和文字颜色。 */
 				box-sizing: border-box;
@@ -190,17 +220,12 @@ const today = new Date();
 
 			/* 左下长文本 */
 			.longtext {
-				grid-area: stage;
-				/* 可改：center 可换成 start/end，控制文本在全屏网格中的大致位置。 */
-				place-self: center;
-				/* 可改：依次为上、右、下、左外边距，用于微调文本位置。 */
-				margin: 0 0 -19vh -22vw;
+				margin: 0;
 				text-align: left; /* 文本左对齐 */
 
 				/* 可改：长文本框宽度与最小高度；内容超过最小高度时会自动向下扩展。 */
 				box-sizing: border-box;
 				width: 17rem;
-				min-height: 6rem;
 
 				/* 字体外观；字体家族由上方 .content p 统一设置。 */
 				font-style: italic;
@@ -212,11 +237,14 @@ const today = new Date();
 
 			/* 网页版权信息 */
 			.rights {
-				grid-area: stage;
-				/* 右下角：第一个 end 控制垂直靠下，第二个 end 控制水平靠右。 */
-				place-self: end end;
-				/* 可改：右、下边距控制版权信息与页面边缘的距离。 */
-				margin: 0 -26vw 2vh 0;
+				/*
+				 * 版权不属于 hero：它独立固定在页面右下角。
+				 * 想调整它离右边 / 下边的距离，分别改下面的 right / bottom。
+				 */
+				position: absolute;
+				right: 1.5rem; /* 贴齐页面右侧；想留边距可改成 1rem。 */
+				bottom: 1rem; /* 贴齐页面底部；想留边距可改成 1rem。 */
+				margin: 0;
 				text-align: right; /* 文本右对齐 */
 
 				/* 可改：版权文本框宽度。 */
@@ -229,6 +257,42 @@ const today = new Date();
 				font-size: 0.8rem; /* 可改：卡片字体大小。 */
 				letter-spacing: 0.1em; /* 可改：字距；正数更疏，负数更紧 */
 				line-height: 1.2; /* 可改：行间距，数值越大行距越宽 */
+			}
+
+			/*
+			 * 仅在手机宽度（640px 以下）生效。
+			 * 这些是防止窄屏文字溢出的保护规则；通常不需要调整。
+			 */
+			@media (max-width: 640px) {
+				.hero {
+					top: clamp(8rem, 24svh, 12rem);
+					width: calc(100vw - (2 * var(--page-gutter)));
+				}
+
+				h1 {
+					font-size: clamp(3rem, 15vw, 5rem);
+					white-space: normal;
+				}
+
+				.hero-details {
+					gap: 1rem;
+				}
+
+				.longtext {
+					width: min(15rem, 55vw);
+					font-size: 0.85rem;
+					letter-spacing: 0.06em;
+				}
+
+				.intro-card {
+					font-size: 1rem;
+				}
+
+				.rights {
+					width: min(14rem, 70vw);
+					font-size: 0.7rem;
+					letter-spacing: 0.06em;
+				}
 			}
 
 			/* 背景噪声 */
