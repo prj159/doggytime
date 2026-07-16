@@ -1,13 +1,12 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/MyHeader.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/MyHeader.astro";
+import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
 
 const today = new Date();
 ---
 
 <!doctype html>
-
 <html lang="zh-CN">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
@@ -18,64 +17,113 @@ const today = new Date();
 		<canvas id="noise-canvas"></canvas>
 		<Header />
 		<main class="content">
-			<!--
-				hero 是标题区域的外层容器：
-				标题、左侧说明、右侧按钮都放在里面，才能始终按彼此对齐。
-			-->
-			<section class="hero">
-				<h1>Doggy Time</h1>
+			<!-- 每个 scene 是一整屏；滚动到下一屏时背景颜色和 hero 内容一起切换。 -->
+			<section class="scene scene--doggy">
+				<!--
+					hero 是标题区域的外层容器：
+					标题、左侧说明、右侧按钮都放在里面，才能始终按彼此对齐。
+				-->
+				<section class="hero">
+					<h1>Doggy Time</h1>
 
-				<!-- 标题下方的一行：左边放说明，右边放博客按钮。 -->
-				<div class="hero-details">
-					<!-- 标题左下长文本 -->
-					<p class="longtext">
-						Doggy Time focuses on the accumulation and sharing of knowledge.
-					</p>
+					<!-- 标题下方的一行：左边放说明，右边放博客按钮。 -->
+					<div class="hero-details">
+						<!-- 标题左下长文本 -->
+						<p class="longtext">
+							Doggy Time focuses on the accumulation and sharing
+							of knowledge.
+						</p>
 
-					<!-- 博客卡片 -->
-					<p class="intro-card">
-						<!-- 可改：href 是点击后跳转的地址；aria-label 是读屏软件读出的链接说明。 -->
-						<a class="intro-link" href="/doggytime/blog" aria-label="进入博客">
-							<!-- 可改：平时显示的文字。 -->
-							<span class="intro-line intro-line--default" aria-hidden="true">/ BLOG</span>
-							<!-- 可改：鼠标悬停或键盘聚焦时显示的文字。 -->
-							<span class="intro-line intro-line--hover" aria-hidden="true">/ VISIT</span>
-						</a>
-					</p>
-				</div>
+						<!-- 博客卡片 -->
+						<p class="intro-card">
+							<a
+								class="intro-link"
+								href="/doggytime/blog"
+								aria-label="进入博客"
+							>
+								<span
+									class="intro-line intro-line--default"
+									aria-hidden="true">/ BLOG</span
+								>
+								<span
+									class="intro-line intro-line--hover"
+									aria-hidden="true">/ VISIT</span
+								>
+							</a>
+						</p>
+					</div>
+				</section>
 			</section>
 
-		<!-- 网页 right -->
-		<p class="rights">
-			&copy; {today.getFullYear()} Doggy Time. <br />
-			All rights reserved.
-		</p>
+			<section class="scene scene--university">
+				<section class="hero">
+					<h1>University</h1>
+
+					<div class="hero-details">
+						<p class="longtext">
+							HITsz pioneers technological
+							advancements at the global forefront.
+						</p>
+
+						<p class="intro-card">
+							<a
+								class="intro-link"
+								href="https://www.hitsz.edu.cn/"
+								aria-label="访问哈尔滨工业大学（深圳）官网"
+							>
+								<span
+									class="intro-line intro-line--default"
+									aria-hidden="true">/ OFFICIAL</span
+								>
+								<span
+									class="intro-line intro-line--hover"
+									aria-hidden="true">/ VISIT</span
+								>
+							</a>
+						</p>
+					</div>
+				</section>
+			</section>
+
+			<!-- 版权固定在整个滚动过程的右下角。 -->
+			<p class="rights">
+				&copy; {today.getFullYear()} Doggy Time. <br />
+				All rights reserved.
+			</p>
 		</main>
 
 		<style>
-			body, html {
+			body,
+			html {
 				margin: 0;
 				padding: 0;
 				height: 100%;
-				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+				font-family:
+					-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+					Helvetica, Arial, sans-serif;
 				color: #111; /* 字体颜色调深 */
-				overflow: hidden; /* 隐藏滚动条，保持全屏沉浸感 */
+				overflow-x: hidden;
+				overflow-y: auto; /* 允许向下滚动到 University 屏。 */
+				/*
+				 * 不使用原生滚动吸附：它会让 JavaScript 的逐帧滚动直接跳到下一屏。
+				 * 下方的 moveToAdjacentScene 会自行完成固定时长的一屏切换。
+				 */
 			}
-			
+
 			.content {
 				/* 覆盖全局 main 的 720px 宽度限制：首页需要占满整个视口。 */
 				width: 100%;
 				max-width: none;
 				margin: 0;
-				/* svh 会避开移动端浏览器地址栏造成的高度跳动。 */
-				min-height: 100svh;
+				/* 两个 scene 各占一屏，因此总高度至少为两倍视口高度。 */
+				min-height: 200svh;
 				/*
 				 * 页面四周的安全边距。通常只需要改这个数值来调整版权离边缘的距离。
 				 * clamp(最小值, 随屏幕变化的值, 最大值)：小屏不会太贴边，大屏不会太空。
 				 */
 				--page-gutter: clamp(1.25rem, 3vw, 4rem);
 				text-align: center;
-				padding: var(--page-gutter);
+				padding: 0;
 				box-sizing: border-box;
 				position: relative;
 				z-index: 1; /* 确保内容在噪声背景上方 */
@@ -84,6 +132,13 @@ const today = new Date();
 			/* 首页内容区内现有及以后新增的所有 p 都统一使用 Average Sans（字体）。 */
 			.content p {
 				font-family: var(--font-average-sans), Arial, sans-serif;
+			}
+
+			/* 每个 scene 独占一屏，并作为其中 hero 的定位参考。 */
+			.scene {
+				position: relative;
+				min-height: 100svh;
+				/* scene 的开头由 moveToAdjacentScene 作为固定时长动画的目标位置。 */
 			}
 
 			/*
@@ -172,12 +227,12 @@ const today = new Date();
 				font-style: italic;
 				color: #454545;
 				font-size: 1.2rem; /* 可改：卡片字体大小。 */
-				letter-spacing: 0.0em; /* 可改：字距；正数更疏，负数更紧 */
+				letter-spacing: 0em; /* 可改：字距；正数更疏，负数更紧 */
 				line-height: 1.6;
 
 				/* 可改：圆角矩形的填充色、边框、圆角和阴影。 */
 				background: rgba(255, 255, 255, 0);
-				border:1px solid rgb(0, 0, 0);
+				border: 1px solid rgb(0, 0, 0);
 				border-radius: 1rem;
 				/* box-shadow: 0 12px 30px rgb(0 0 0 / 8%); */
 				/* 保留这个裁切，移出卡片的文字才会被隐藏。 */
@@ -198,7 +253,9 @@ const today = new Date();
 			.intro-line {
 				grid-area: 1 / 1;
 				/* 可改：260ms 是动画时长；只动画 transform/opacity 会更流畅。 */
-				transition: transform 260ms ease, opacity 260ms ease;
+				transition:
+					transform 260ms ease,
+					opacity 260ms ease;
 			}
 
 			.intro-line--hover {
@@ -226,11 +283,12 @@ const today = new Date();
 				/* 可改：长文本框宽度与最小高度；内容超过最小高度时会自动向下扩展。 */
 				box-sizing: border-box;
 				width: 17rem;
+				flex: 0 0 auto;
 
 				/* 字体外观；字体家族由上方 .content p 统一设置。 */
 				font-style: italic;
-				color:#454545;
-				font-size: 1.0rem; /* 可改：卡片字体大小。 */
+				color: #454545;
+				font-size: 1rem; /* 可改：卡片字体大小。 */
 				letter-spacing: 0.1em; /* 可改：字距；正数更疏，负数更紧 */
 				line-height: 1.2; /* 可改：行间距，数值越大行距越宽 */
 			}
@@ -241,7 +299,7 @@ const today = new Date();
 				 * 版权不属于 hero：它独立固定在页面右下角。
 				 * 想调整它离右边 / 下边的距离，分别改下面的 right / bottom。
 				 */
-				position: absolute;
+				position: fixed;
 				right: 1.5rem; /* 贴齐页面右侧；想留边距可改成 1rem。 */
 				bottom: 1rem; /* 贴齐页面底部；想留边距可改成 1rem。 */
 				margin: 0;
@@ -253,7 +311,7 @@ const today = new Date();
 
 				/* 字体外观；字体家族由上方 .content p 统一设置。 */
 				font-style: italic;
-				color:#454545;
+				color: #454545;
 				font-size: 0.8rem; /* 可改：卡片字体大小。 */
 				letter-spacing: 0.1em; /* 可改：字距；正数更疏，负数更紧 */
 				line-height: 1.2; /* 可改：行间距，数值越大行距越宽 */
@@ -280,6 +338,9 @@ const today = new Date();
 
 				.longtext {
 					width: min(15rem, 55vw);
+				}
+
+				.longtext {
 					font-size: 0.85rem;
 					letter-spacing: 0.06em;
 				}
@@ -309,12 +370,142 @@ const today = new Date();
 
 		<!-- 绘制背景噪声 -->
 		<script>
-			import { createNoise3D } from 'simplex-noise';
-			const canvas = document.getElementById('noise-canvas') as HTMLCanvasElement;
-			const gl = canvas.getContext('webgl', {
+			import { createNoise3D } from "simplex-noise";
+			const canvas = document.getElementById(
+				"noise-canvas",
+			) as HTMLCanvasElement;
+			const scenes = [
+				...document.querySelectorAll<HTMLElement>(".scene"),
+			];
+			let scrollProgress = 0;
+			let isSceneTransitioning = false;
+			const sceneTransitionDuration = 750; /* 每次上下切换固定使用 750ms。 */
+
+			/*
+			 * 0 表示第一页顶部，1 表示第二页底部。
+			 * WebGL 和 2D 回退都会读取这个值，只改变颜色，不停止噪声的时间动画。
+			 */
+			function updateScrollProgress() {
+				/* Safari 等浏览器可能让 body 而不是 html 成为滚动容器，因此两个值都要读取。 */
+				const scrollTop = Math.max(
+					window.scrollY,
+					document.documentElement.scrollTop,
+					document.body.scrollTop,
+				);
+				const pageHeight = Math.max(
+					document.documentElement.scrollHeight,
+					document.body.scrollHeight,
+				);
+				const maxScroll = Math.max(1, pageHeight - window.innerHeight);
+				scrollProgress = Math.min(
+					1,
+					Math.max(0, scrollTop / maxScroll),
+				);
+			}
+
+			/* 读取当前滚动位置；Safari 可能使用 body，其它浏览器通常使用 html。 */
+			function getScrollTop() {
+				return Math.max(
+					window.scrollY,
+					document.documentElement.scrollTop,
+					document.body.scrollTop,
+				);
+			}
+
+			/* 把位置同时写给三个可能的滚动容器，确保不同浏览器都能平稳切换。 */
+			function setScrollTop(top: number) {
+				window.scrollTo({ top, left: 0, behavior: "auto" });
+				document.documentElement.scrollTop = top;
+				document.body.scrollTop = top;
+			}
+
+			/* 找出离当前视口最近的一屏，滚轮只会从这屏切到相邻的一屏。 */
+			function getCurrentSceneIndex() {
+				const scrollTop = getScrollTop();
+				return scenes.reduce((closestIndex, scene, index) => {
+					const closestTop =
+						scenes[closestIndex].getBoundingClientRect().top +
+						scrollTop;
+					const sceneTop =
+						scene.getBoundingClientRect().top + scrollTop;
+					return Math.abs(sceneTop - scrollTop) <
+						Math.abs(closestTop - scrollTop)
+						? index
+						: closestIndex;
+				}, 0);
+			}
+
+			/*
+			 * 不直接使用浏览器原生滚动速度，而是在固定时间内移动到相邻 scene。
+			 * 背景颜色仍从 scrollProgress 读取，因此会和这一段 750ms 位移同步变化。
+			 */
+			function moveToAdjacentScene(direction: number) {
+				if (isSceneTransitioning) return;
+
+				const currentIndex = getCurrentSceneIndex();
+				const targetIndex = Math.min(
+					scenes.length - 1,
+					Math.max(0, currentIndex + direction),
+				);
+				if (targetIndex === currentIndex) return;
+
+				const startTop = getScrollTop();
+				const targetTop =
+					scenes[targetIndex].getBoundingClientRect().top + startTop;
+				const startTime = performance.now();
+				isSceneTransitioning = true;
+
+				function animateSceneScroll(now: number) {
+					const progress = Math.min(
+						1,
+						(now - startTime) / sceneTransitionDuration,
+					);
+					/* ease-out：开始有响应，结束时自然减速。 */
+					const easedProgress = 1 - Math.pow(1 - progress, 4);
+					setScrollTop(
+						startTop + (targetTop - startTop) * easedProgress,
+					);
+
+					if (progress < 1) {
+						requestAnimationFrame(animateSceneScroll);
+					} else {
+						setScrollTop(targetTop);
+						isSceneTransitioning = false;
+					}
+				}
+
+				requestAnimationFrame(animateSceneScroll);
+			}
+
+			updateScrollProgress();
+			window.addEventListener("scroll", updateScrollProgress, {
+				passive: true,
+			});
+			window.addEventListener("resize", updateScrollProgress, {
+				passive: true,
+			});
+			/*
+			 * 拦截鼠标滚轮与触控板滚动；切换进行中继续滚动也不会缩短动画。
+			 * 横向滚动和按住 Ctrl 的缩放操作不受影响。
+			 */
+			window.addEventListener(
+				"wheel",
+				(event) => {
+					if (
+						event.ctrlKey ||
+						Math.abs(event.deltaY) <= Math.abs(event.deltaX)
+					)
+						return;
+					event.preventDefault();
+					moveToAdjacentScene(Math.sign(event.deltaY));
+				},
+				{ passive: false },
+			);
+
+			const gl = canvas.getContext("webgl", {
 				alpha: false,
 				antialias: false,
-				powerPreference: 'high-performance',
+				powerPreference: "high-performance",
 			});
 
 			if (gl) {
@@ -329,6 +520,7 @@ const today = new Date();
 				const fragmentSource = `
 					precision highp float;
 					uniform float time;
+					uniform float colorProgress;
 
 					vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
 					vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
@@ -389,38 +581,61 @@ const today = new Date();
 					void main() {
 						float value = simplexNoise(vec3(gl_FragCoord.xy * 0.001, time));
 						float lightness = clamp(0.725 + value * 0.225, 0.0, 1.0);
-						gl_FragColor = vec4(hslToRgb(16.0 / 360.0, 0.6, lightness), 1.0);
+						/* 噪声值持续决定明暗；滚动进度只负责在橙色和蓝色间混合。 */
+						vec3 orange = hslToRgb(16.0 / 360.0, 0.6, lightness);
+						vec3 blue = hslToRgb(216.0 / 360.0, 0.6, lightness);
+						gl_FragColor = vec4(mix(orange, blue, colorProgress), 1.0);
 					}
 				`;
 
 				function compileShader(type: number, source: string) {
 					const shader = gl.createShader(type);
-					if (!shader) throw new Error('无法创建 WebGL 着色器');
+					if (!shader) throw new Error("无法创建 WebGL 着色器");
 					gl.shaderSource(shader, source);
 					gl.compileShader(shader);
 					if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-						throw new Error(gl.getShaderInfoLog(shader) ?? 'WebGL 着色器编译失败');
+						throw new Error(
+							gl.getShaderInfoLog(shader) ??
+								"WebGL 着色器编译失败",
+						);
 					}
 					return shader;
 				}
 
 				const program = gl.createProgram();
-				if (!program) throw new Error('无法创建 WebGL 程序');
-				gl.attachShader(program, compileShader(gl.VERTEX_SHADER, vertexSource));
-				gl.attachShader(program, compileShader(gl.FRAGMENT_SHADER, fragmentSource));
+				if (!program) throw new Error("无法创建 WebGL 程序");
+				gl.attachShader(
+					program,
+					compileShader(gl.VERTEX_SHADER, vertexSource),
+				);
+				gl.attachShader(
+					program,
+					compileShader(gl.FRAGMENT_SHADER, fragmentSource),
+				);
 				gl.linkProgram(program);
 				if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-					throw new Error(gl.getProgramInfoLog(program) ?? 'WebGL 程序链接失败');
+					throw new Error(
+						gl.getProgramInfoLog(program) ?? "WebGL 程序链接失败",
+					);
 				}
 
-				const position = gl.getAttribLocation(program, 'position');
-				const time = gl.getUniformLocation(program, 'time');
+				const position = gl.getAttribLocation(program, "position");
+				const time = gl.getUniformLocation(program, "time");
+				const colorProgress = gl.getUniformLocation(
+					program,
+					"colorProgress",
+				);
 				const buffer = gl.createBuffer();
-				if (position < 0 || !time || !buffer) throw new Error('无法初始化 WebGL 背景噪声');
+				if (position < 0 || !time || !colorProgress || !buffer)
+					throw new Error("无法初始化 WebGL 背景噪声");
 
 				gl.useProgram(program);
 				gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+				gl.bufferData(
+					gl.ARRAY_BUFFER,
+					new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]),
+					gl.STATIC_DRAW,
+				);
 				gl.enableVertexAttribArray(position);
 				gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
 
@@ -433,115 +648,145 @@ const today = new Date();
 
 				const startTime = performance.now();
 				function draw(now: number) {
+					/* body / html 的实际滚动容器会因浏览器而异，每帧读取可保证颜色进度正确。 */
+					updateScrollProgress();
 					gl.uniform1f(time, (now - startTime) * 0.0003);
+					gl.uniform1f(colorProgress, scrollProgress);
 					gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 					requestAnimationFrame(draw);
 				}
 
 				resizeCanvas();
-				window.addEventListener('resize', resizeCanvas, { passive: true });
+				window.addEventListener("resize", resizeCanvas, {
+					passive: true,
+				});
 				requestAnimationFrame(draw);
 			} else {
 				const noise3D = createNoise3D();
-				const ctx = canvas.getContext('2d');
+				const ctx = canvas.getContext("2d");
 
-			if (!ctx) throw new Error('无法创建背景噪声画布');
+				if (!ctx) throw new Error("无法创建背景噪声画布");
 
-			let imageData: ImageData;
-			let pixels: Uint8ClampedArray;
-			let width = 0;
-			let height = 0;
-			let resizeTimer = 0;
-			let time = 0;
+				let imageData: ImageData;
+				let pixels: Uint8ClampedArray;
+				let width = 0;
+				let height = 0;
+				let resizeTimer = 0;
+				let time = 0;
 
-			// 颜色查找表：色相(16)和饱和度(60%)不变，只有亮度随噪声波动
-			// 提前把 亮度 -> RGB 的映射算好，避免每个像素都重复做一次 HSL 转 RGB
-			// --- 颜色调节 ---
-			// 色相 hue: 改 hslToRgb 的第一个参数 (16/360)，0=红 120=绿 240=蓝
-			// 饱和度 saturation: 改 hslToRgb 的第二个参数 (0.6)，0=灰 1=鲜艳
-			const LUT_SIZE = 4096;
-			const colorLUT = new Uint8Array(LUT_SIZE * 3);
+				// 颜色查找表：噪声持续决定亮度，滚动时只更新橙色到蓝色的颜色映射。
+				// 提前把 亮度 -> RGB 的映射算好，避免每个像素都重复做一次 HSL 转 RGB
+				// --- 颜色调节 ---
+				// 色相 hue: 改 hslToRgb 的第一个参数 (16/360)，0=红 120=绿 240=蓝
+				// 饱和度 saturation: 改 hslToRgb 的第二个参数 (0.6)，0=灰 1=鲜艳
+				const LUT_SIZE = 4096;
+				const colorLUT = new Uint8Array(LUT_SIZE * 3);
 
-			function hslToRgb(h, s, l) {
-				let r, g, b;
-				if (s === 0) {
-					r = g = b = l;
-				} else {
-					const hue2rgb = (p, q, t) => {
-						if (t < 0) t += 1;
-						if (t > 1) t -= 1;
-						if (t < 1 / 6) return p + (q - p) * 6 * t;
-						if (t < 1 / 2) return q;
-						if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
-						return p;
-					};
-					const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-					const p = 2 * l - q;
-					r = hue2rgb(p, q, h + 1 / 3);
-					g = hue2rgb(p, q, h);
-					b = hue2rgb(p, q, h - 1 / 3);
+				function hslToRgb(h, s, l) {
+					let r, g, b;
+					if (s === 0) {
+						r = g = b = l;
+					} else {
+						const hue2rgb = (p, q, t) => {
+							if (t < 0) t += 1;
+							if (t > 1) t -= 1;
+							if (t < 1 / 6) return p + (q - p) * 6 * t;
+							if (t < 1 / 2) return q;
+							if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+							return p;
+						};
+						const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+						const p = 2 * l - q;
+						r = hue2rgb(p, q, h + 1 / 3);
+						g = hue2rgb(p, q, h);
+						b = hue2rgb(p, q, h - 1 / 3);
+					}
+					return [
+						Math.round(r * 255),
+						Math.round(g * 255),
+						Math.round(b * 255),
+					];
 				}
-				return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
-			}
 
-			for (let i = 0; i < LUT_SIZE; i++) {
-				// 假设噪声库的输出范围在 -1 到 1 之间
-				const value = (i / (LUT_SIZE - 1)) * 2 - 1;
-				let lightness = 22.5 * value + 72.5;	// 亮度范围 lightness
-				lightness = Math.min(100, Math.max(0, lightness));
-				const [r, g, b] = hslToRgb(16 / 360, 0.6, lightness / 100);
-				colorLUT[i * 3] = r;
-				colorLUT[i * 3 + 1] = g;
-				colorLUT[i * 3 + 2] = b;
-			}
-
-			function resizeCanvas() {
-				// 保持画布缓冲区与浏览器视口同尺寸，不降低背景的实际分辨率。
-				width = Math.max(1, window.innerWidth);
-				height = Math.max(1, window.innerHeight);
-				canvas.width = width;
-				canvas.height = height;
-				imageData = ctx.createImageData(width, height);
-				pixels = imageData.data;
-				renderNoise();
-			}
-
-			function renderNoise() {
-				for (let y = 0; y < height; y++) {
-					for (let x = 0; x < width; x++) {
-						const value = noise3D(x * 0.001, y * 0.001, time);
-
-						let idx = Math.round(((value + 1) * 0.5) * (LUT_SIZE - 1));
-						idx = idx < 0 ? 0 : idx >= LUT_SIZE ? LUT_SIZE - 1 : idx;
-						const o = idx * 3;
-
-						const p = (y * width + x) * 4;
-						pixels[p] = colorLUT[o];
-						pixels[p + 1] = colorLUT[o + 1];
-						pixels[p + 2] = colorLUT[o + 2];
-						pixels[p + 3] = 255;
+				function updateColorLUT(progress: number) {
+					const hue = (16 + (216 - 16) * progress) / 360;
+					for (let i = 0; i < LUT_SIZE; i++) {
+						const value = (i / (LUT_SIZE - 1)) * 2 - 1;
+						let lightness = 22.5 * value + 72.5;
+						lightness = Math.min(100, Math.max(0, lightness));
+						const [r, g, b] = hslToRgb(hue, 0.6, lightness / 100);
+						colorLUT[i * 3] = r;
+						colorLUT[i * 3 + 1] = g;
+						colorLUT[i * 3 + 2] = b;
 					}
 				}
 
-				// 一次性提交完整视口分辨率的像素缓冲区。
-				ctx.putImageData(imageData, 0, 0);
-			}
+				let renderedColorProgress = -1;
 
-			function scheduleResize() {
-				window.clearTimeout(resizeTimer);
-				// 拖动窗口时不要连续重算全屏噪声，等尺寸稳定后再重绘一次。
-				resizeTimer = window.setTimeout(resizeCanvas, 150);
-			}
+				function resizeCanvas() {
+					// 保持画布缓冲区与浏览器视口同尺寸，不降低背景的实际分辨率。
+					width = Math.max(1, window.innerWidth);
+					height = Math.max(1, window.innerHeight);
+					canvas.width = width;
+					canvas.height = height;
+					imageData = ctx.createImageData(width, height);
+					pixels = imageData.data;
+					renderNoise();
+				}
 
-			function draw() {
-				renderNoise();
-				time += 0.02;
+				function renderNoise() {
+					for (let y = 0; y < height; y++) {
+						for (let x = 0; x < width; x++) {
+							const value = noise3D(x * 0.001, y * 0.001, time);
+
+							let idx = Math.round(
+								(value + 1) * 0.5 * (LUT_SIZE - 1),
+							);
+							idx =
+								idx < 0
+									? 0
+									: idx >= LUT_SIZE
+										? LUT_SIZE - 1
+										: idx;
+							const o = idx * 3;
+
+							const p = (y * width + x) * 4;
+							pixels[p] = colorLUT[o];
+							pixels[p + 1] = colorLUT[o + 1];
+							pixels[p + 2] = colorLUT[o + 2];
+							pixels[p + 3] = 255;
+						}
+					}
+
+					// 一次性提交完整视口分辨率的像素缓冲区。
+					ctx.putImageData(imageData, 0, 0);
+				}
+
+				function scheduleResize() {
+					window.clearTimeout(resizeTimer);
+					// 拖动窗口时不要连续重算全屏噪声，等尺寸稳定后再重绘一次。
+					resizeTimer = window.setTimeout(resizeCanvas, 150);
+				}
+
+				function draw() {
+					updateScrollProgress();
+					/* 颜色进度改变时才重建查找表，噪声渲染仍保持每帧运行。 */
+					if (
+						Math.abs(renderedColorProgress - scrollProgress) > 0.002
+					) {
+						updateColorLUT(scrollProgress);
+						renderedColorProgress = scrollProgress;
+					}
+					renderNoise();
+					time += 0.02;
+					requestAnimationFrame(draw);
+				}
+
+				resizeCanvas();
+				window.addEventListener("resize", scheduleResize, {
+					passive: true,
+				});
 				requestAnimationFrame(draw);
-			}
-
-			resizeCanvas();
-			window.addEventListener('resize', scheduleResize, { passive: true });
-			requestAnimationFrame(draw);
 			}
 		</script>
 	</body>
